@@ -1,25 +1,21 @@
-using System;
 using System.Timers;
 
-namespace SignalBook;
+namespace SignalBook.Controllers;
 
-public class TimeInterface
+public class TimeController
 {
     private static System.Timers.Timer clockTimer;
     public DateTime Time;
 
-    public TimeInterface()
+    public TimeController()
     {
         InitializeTime();
         SetTimer();
-        Console.ReadLine();
-        clockTimer.Stop();
-        clockTimer.Dispose();
     }
 
-    public void InitializeTime()
+    private void InitializeTime()
     {
-        Console.WriteLine("Enter the time in a HH:MM:SS format\n>>>");
+        Console.WriteLine("Enter the time in a HH:MM:SS format.");
         string? userInput = Console.ReadLine();
 
         if (string.IsNullOrEmpty(userInput)) { Time = DateTime.Now; }
@@ -32,7 +28,8 @@ public class TimeInterface
         {
             Console.Error.Write("Invalid time format. Reverting to current system time.\n");
             Time = DateTime.Now;
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             Console.Error.Write($"An error occurred: {ex.Message}. Reverting to current system time.\n");
             Time = DateTime.Now;
@@ -47,9 +44,20 @@ public class TimeInterface
         clockTimer.Enabled = true;
     }
 
+    public void StopTimer(bool pause = false)
+    {
+        clockTimer.Stop();
+        if (pause)
+        {
+            clockTimer.Dispose();
+        }
+    }
+
     private void ClockTimerCallback(object o, ElapsedEventArgs e)
     {
         Time += TimeSpan.FromSeconds(1);
-        Console.WriteLine($"Time is {Time}");
+
+        // For debugging purposes
+        // Console.WriteLine($"Time is {Time.TimeOfDay}");
     }
 }
