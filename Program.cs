@@ -1,13 +1,15 @@
-﻿namespace SignalBook
+﻿using SignalBook.Controllers;
+
+namespace SignalBook
 {
     public static class Program
     {
-        private static TimeInterface _timeInterface;
+        private static TimeController _timeInterface;
 
         public static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            _timeInterface = new TimeInterface();
+            _timeInterface = new TimeController();
 
         }
     }
