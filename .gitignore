@@ -82,7 +82,5 @@ fabric.properties
 bin/
 obj/
 
-# Common node modules locations
-/node_modules
-/wwwroot/node_modules
-
+# Scratch test file - this is something I use to quickly test code snippets without modifying actual project files
+tests/ScratchTests.cs
