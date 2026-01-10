@@ -10,7 +10,7 @@ public class TimeController
     public TimeController()
     {
         InitializeTime();
-        SetTimer();
+        StartTimer();
     }
 
     private void InitializeTime()
@@ -36,7 +36,7 @@ public class TimeController
         }
     }
 
-    private void SetTimer()
+    public void StartTimer()
     {
         clockTimer = new System.Timers.Timer(1000);
         clockTimer.Elapsed += ClockTimerCallback;

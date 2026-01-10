@@ -1,0 +1,8 @@
+{
+  "Boats": [
+    { "Number": "U-1", "RadioOperator": "A", "ColourString": "Red" },
+    { "Number": "U-2", "RadioOperator": "B", "ColourString": "Green" },
+    { "Number": "U-3", "RadioOperator": "C", "ColourString": "Gold" },
+    { "Number": "U-4", "RadioOperator": "D", "ColourString": "CadetBlue" }
+  ]
+}

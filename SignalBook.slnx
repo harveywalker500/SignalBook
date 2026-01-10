@@ -1,3 +1,9 @@
 <Solution>
-  <Project Path="SignalBook.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/SignalBook.CLI/SignalBook.CLI.csproj" />
+    <Project Path="src/SignalBook.Library/SignalBook.Library.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SignalBook.Tests/SignalBook.Tests.csproj" />
+  </Folder>
 </Solution>
