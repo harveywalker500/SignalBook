@@ -1,4 +1,4 @@
-name: .NET Build and Publish
+name: Dotnet-Build-And-Publish
 
 on:
   push:
