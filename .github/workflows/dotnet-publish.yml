@@ -36,6 +36,7 @@ jobs:
         run: dotnet test -c Release --no-build
 
       - name: Publish
+        shell: bash
         run: |
           dotnet publish src/SignalBook.CLI \
             -c Release \
