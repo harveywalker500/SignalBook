@@ -1,15 +1,19 @@
-﻿using SignalBook.Controllers;
+﻿using SignalBook.Library.Controllers;
+using Spectre.Console;
 
 namespace SignalBook.CLI;
 
 public static class Program
 {
-    private static TimeController _timeInterface;
+    private static TerminalController? _terminalController;
 
     public static void Main(string[] args)
     {
-        Console.WriteLine("Hello World!");
-        _timeInterface = new TimeController();
+        var banner = new FigletText("SignalBook")
+            .Color(Color.DodgerBlue1);
+        AnsiConsole.Write(banner);
+        _terminalController = new TerminalController();
+        _terminalController.Start();
 
     }
 }

@@ -6,4 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Spectre.Console" Version="0.54.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="../SignalBook.CLI/Configs/*.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
