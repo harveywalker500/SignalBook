@@ -1,10 +1,12 @@
-name: Dotnet-Build-And-Publish
+name: .NET Build and Publish
 
 on:
   push:
     branches:
       - main
   pull_request:
+    - branches:
+      - main
 
 jobs:
   build:
