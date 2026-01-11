@@ -1,25 +1,42 @@
+using System.Reflection;
 using SignalBook.Controllers;
 using Spectre.Console;
 
 namespace SignalBook.Library.Controllers;
 
+/// <summary>
+/// The terminal controller responsible for handling user input and coordinating between the TimeController and LogbookController.
+/// </summary>
 public class TerminalController
 {
-    private TimeController _timeController;
-    private LogbookController _logbookController;
+    /// <summary>
+    /// The TimeController instance. See <see cref="TimeController"/>
+    /// </summary>
+    private readonly TimeController _timeController;
+    /// <summary>
+    /// The LogbookController instance. See <see cref="LogbookController"/>
+    /// </summary>
+    private readonly LogbookController _logbookController;
 
+    /// <summary>
+    /// The initialiser for the TerminalController. Prompts the user for initial time and config file.
+    /// </summary>
     public TerminalController()
     {
-        _timeController = new TimeController();
+        _timeController = new TimeController(PromptUser("[yellow]Enter the new time (HH:MM:SS). Leave blank to use current system time.[/]"));
         _logbookController = new LogbookController();
-        _logbookController.LoadConfig();
+        _logbookController.LoadConfig(PromptUser("[yellow]Enter the name of the config file.[/]"));
+        Start();
     }
 
-    public void Start()
+    /// <summary>
+    /// Starts the main command loop, prompting the user for input until they choose to exit.
+    /// </summary>
+    private void Start()
     {
         while (true)
         {
-            string? input = AnsiConsole.Ask<string>("[yellow]cmd>[/]");
+            string input = AnsiConsole.Ask<string>("[yellow]cmd>[/]");
             input = input.Trim().ToLower();
             if (!HandleUserInput(input))
             {
@@ -30,13 +47,20 @@ public class TerminalController
         Stop();
     }
 
+    /// <summary>
+    /// Stops the terminal controller and cleans up resources.
+    /// </summary>
     private void Stop()
     {
         _timeController.StopTimer();
-        AnsiConsole.MarkupLine("[green dim]Saving logbook...[/]");
-        _logbookController.SaveLog();
     }
 
+    /// <summary>
+    /// The main terminal input handler.
+    /// Processes user commands and delegates to the appropriate controller methods.
+    /// </summary>
+    /// <param name="input">The user's input into the console.</param>
+    /// <returns>Boolean for if the controller should continue checking for user input. Used for the exit process.</returns>
     private bool HandleUserInput(string? input)
     {
         if (string.IsNullOrEmpty(input))
@@ -52,7 +76,7 @@ public class TerminalController
                 return true;
 
             case "time set":
-                _timeController.InitialiseTime();
+                _timeController.InitialiseTime(PromptUser("Enter the new time (HH:MM:SS). Leave blank to use current system time."));
                 return true;
 
             case "config show":
@@ -67,16 +91,12 @@ public class TerminalController
                 return true;
 
             case "config load":
-                _logbookController.LoadConfig();
+                _logbookController.LoadConfig(PromptUser("Enter the name of the config file."));
                 return true;
 
             case "config save":
-                _logbookController.SaveConfig();
+                _logbookController.SaveConfig(PromptUser("Enter the name of the config file."));
                 return true;
-
-            case "exit":
-            case "quit":
-                return false;
 
             case "log":
                 return LogMode();
@@ -90,12 +110,17 @@ public class TerminalController
                 return true;
 
             case "log load":
-                _logbookController.LoadLog();
+                _logbookController.LoadLog(PromptUser("Enter the name of the log file."));
                 return true;
 
             case "log save":
                 _logbookController.SaveLog();
                 AnsiConsole.MarkupLine("[green dim]Logbook saved.[/]");
+                return true;
+
+            case "info":
+                string version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
+                AnsiConsole.MarkupLine($"[blue]SignalBook \n Version: {version} \n Author: Harvey Walker \n License: MIT[/]");
                 return true;
 
             case "help":
@@ -117,10 +142,22 @@ public class TerminalController
                                        log save        - Save the current logbook to file
                                        
                                        ------ Other commands -----
+                                       info            - Show application information
                                        help            - Show this help message
                                        exit, quit      - Exit the application
                                        """);
                 return true;
+            case "exit":
+            case "quit":
+                if (_logbookController.SavedLogEntriesCount <= _logbookController.RadioLog.Count)
+                {
+                    if (AnsiConsole.Confirm("There are unsaved log entries. Do you want to save them first? (Y/N)\n>>>"))
+                    {
+                        AnsiConsole.MarkupLine("[green dim]Saving logbook...[/]");
+                        _logbookController.SaveLog();
+                    }
+                }
+                return false;
 
             default:
                 AnsiConsole.MarkupLine("[red]Unknown command. Type 'help' for a list of commands.[/]");
@@ -128,13 +165,16 @@ public class TerminalController
         }
     }
 
+    /// <summary>
+    /// Enters "log mode" where the user can input log entries until they type "exit".
+    /// </summary>
+    /// <returns>Boolean for if the controller should contiunue checking for log entries. Used to exit back to the main loop.</returns>
     private bool LogMode()
     {
         AnsiConsole.MarkupLine("Log mode is activated. Type \"exit\" to exit.");
         while (true)
         {
             string? logInput = AnsiConsole.Ask<string>("[yellow]log>[/]");
-            logInput = logInput.Trim().ToLower();
             if (logInput == "exit")
             {
                 AnsiConsole.MarkupLine("Exiting log mode.");
@@ -148,4 +188,19 @@ public class TerminalController
             _logbookController.Log(logInput, _timeController);
         }
     }
+
+    /// <summary>
+    /// Prompts the user for input with a given prompt message.
+    /// </summary>
+    /// <param name="prompt">The text to be displayed for the user.</param>
+    /// <returns>The user's input as a string.</returns>
+    private static string PromptUser(string prompt)
+    {
+        var textPrompt = new TextPrompt<string>(
+                $"[yellow]{prompt}\n>>>[/]")
+            .AllowEmpty();
+        var promptReturn = AnsiConsole.Prompt(textPrompt);
+        return promptReturn;
+    }
 }
+

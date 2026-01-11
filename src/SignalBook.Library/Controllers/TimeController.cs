@@ -1,41 +1,59 @@
 using System.Timers;
+using Spectre.Console;
 
 namespace SignalBook.Controllers;
 
+/// <summary>
+/// The time controller responsible for managing the simulated clock.
+/// </summary>
 public class TimeController
 {
+    /// <summary>
+    /// The timer that updates the simulated clock every second.
+    /// </summary>
     private static System.Timers.Timer clockTimer;
+    /// <summary>
+    /// The current simulated time.
+    /// </summary>
     public DateTime Time;
 
-    public TimeController()
+    /// <summary>
+    /// Initialises a new instance of the <see cref="TimeController"/> class.
+    /// </summary>
+    /// <param name="initialTime">The time the <see cref="Time"/> variable is initially set.</param>
+    public TimeController(string initialTime)
     {
-        InitialiseTime();
+        InitialiseTime(initialTime);
         StartTimer();
     }
 
-    public void InitialiseTime()
+    /// <summary>
+    /// Initialises the simulated time using the provided time.
+    /// </summary>
+    /// <param name="initialTime">The time the <see cref="Time"/> variable is initially set.</param>
+    public void InitialiseTime(string initialTime)
     {
-        Console.WriteLine("Enter the time in a HH:MM:SS format.");
-        string? userInput = Console.ReadLine();
-
-        if (string.IsNullOrEmpty(userInput)) { Time = DateTime.Now; }
+        if (string.IsNullOrEmpty(initialTime)) { Time = DateTime.Now; }
 
         try
         {
-            Time = DateTime.Parse(userInput);
+            Time = DateTime.Parse(initialTime);
         }
         catch (FormatException)
         {
-            Console.Error.Write("Invalid time format. Reverting to current system time.\n");
+            AnsiConsole.MarkupLine("[red] Invalid time format. Reverting to current system time. [/]");
             Time = DateTime.Now;
         }
         catch (Exception ex)
         {
-            Console.Error.Write($"An error occurred: {ex.Message}. Reverting to current system time.\n");
+            AnsiConsole.MarkupLine($"[red] An error occurred: {ex.Message}. Reverting to current system time. [/]");
             Time = DateTime.Now;
         }
     }
 
+    /// <summary>
+    /// Starts the <see cref="clockTimer"/> to update the simulated time every second.
+    /// </summary>
     public void StartTimer()
     {
         clockTimer = new System.Timers.Timer(1000);
@@ -44,6 +62,10 @@ public class TimeController
         clockTimer.Enabled = true;
     }
 
+    /// <summary>
+    /// Stops or pauses the <see cref="clockTimer"/>.
+    /// </summary>
+    /// <param name="pause">Flag to determine if the timer is disposed of. Used for pausing the time.</param>
     public void StopTimer(bool pause = false)
     {
         clockTimer.Stop();
@@ -53,6 +75,11 @@ public class TimeController
         }
     }
 
+    /// <summary>
+    /// The callback method for the <see cref="clockTimer"/> that increments the simulated time by one second.
+    /// </summary>
+    /// <param name="o">The source of the event.</param>
+    /// <param name="e">The event data.</param>
     private void ClockTimerCallback(object o, ElapsedEventArgs e)
     {
         Time += TimeSpan.FromSeconds(1);
