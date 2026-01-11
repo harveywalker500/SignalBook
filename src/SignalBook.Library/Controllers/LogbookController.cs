@@ -1,18 +1,24 @@
-using System.Drawing;
-using System.Net.Mime;
-using System.Reflection;
 using System.Text.Json;
+using Spectre.Console;
 
 namespace SignalBook.Controllers;
 
 public class LogbookController
 {
-    public Boat[] Boats { get; set; }
-    public string[] RadioLog { get; set; }
+    public static Boat[] Boats { get; set; }
+    public List<string> RadioLog { get; set; }
     public string ConfigFileLocation { get; set; }
 
-    public void LoadConfig(string? configFileName = "userConfig.json")
+    public LogbookController()
     {
+        Boats = Array.Empty<Boat>();
+        RadioLog = new List<string>();
+    }
+
+    public void LoadConfig()
+    {
+        string? configFileName = PromptUser("Enter the configuration file name (or press Enter to use default)");
+
         if (!string.IsNullOrEmpty(configFileName))
         {
             ConfigFileLocation = AppDomain.CurrentDomain.BaseDirectory + configFileName;
@@ -38,7 +44,7 @@ public class LogbookController
         Boats = JsonSerializer.Deserialize<UserConfig>(json, options).Boats;
     }
 
-    public void EditConfig() 
+    public static void EditConfig()
     {
         for (int i = 0; i < Boats.Length; i++)
         {
@@ -73,6 +79,43 @@ public class LogbookController
             new UserConfig { Boats = Boats }, options
         );
         File.WriteAllText(ConfigFileLocation, json);
+    }
+
+    public void Log(string message, TimeController timeController)
+    {
+        var timestamp = timeController.Time.ToString(format: "HH:mm:ss");
+        RadioLog.Add($"{timestamp}: {message}");
+    }
+
+    public void LoadLog()
+    {
+        var logFileName = PromptUser("Enter the name of the log file.");
+        var logFileLocation = AppDomain.CurrentDomain.BaseDirectory + logFileName;
+        StreamReader logFile = new StreamReader(logFileLocation);
+        while (logFile.EndOfStream == false)
+        {
+            RadioLog.Add(logFile.ReadLine());
+        }
+    }
+
+    public void SaveLog(string logFileName = "Radio Log.txt")
+    {
+        var logFileLocation = AppDomain.CurrentDomain.BaseDirectory + logFileName;
+        StreamWriter logFile = new StreamWriter(logFileLocation);
+        foreach (string line in RadioLog)
+        {
+            logFile.WriteLine(line);
+        }
+        logFile.Close();
+    }
+
+    private string PromptUser(string prompt)
+    {
+        var textPrompt = new TextPrompt<string>(
+                $"[yellow]{prompt}\n>>>[/]")
+            .AllowEmpty();
+        var promptReturn = AnsiConsole.Prompt(textPrompt);
+        return promptReturn;
     }
 }
 
