@@ -9,11 +9,11 @@ public class TimeController
 
     public TimeController()
     {
-        InitializeTime();
+        InitialiseTime();
         StartTimer();
     }
 
-    private void InitializeTime()
+    public void InitialiseTime()
     {
         Console.WriteLine("Enter the time in a HH:MM:SS format.");
         string? userInput = Console.ReadLine();
