@@ -21,11 +21,29 @@ public class TerminalController
     /// <summary>
     /// The initialiser for the TerminalController. Prompts the user for initial time and config file.
     /// </summary>
-    public TerminalController()
+    public TerminalController(string initialTime = "", string configFile = "")
     {
-        _timeController = new TimeController(PromptUser("[yellow]Enter the new time (HH:MM:SS). Leave blank to use current system time.[/]"));
-        _logbookController = new LogbookController();
-        _logbookController.LoadConfig(PromptUser("[yellow]Enter the name of the config file.[/]"));
+        if (!string.IsNullOrWhiteSpace(initialTime))
+        {
+            _timeController = new TimeController(initialTime);
+        }
+        else
+        {
+            _timeController =
+                new TimeController(
+                    PromptUser("[yellow]Enter the new time (HH:MM:SS). Leave blank to use current system time.[/]"));
+        }
+
+        if (!string.IsNullOrWhiteSpace(configFile))
+        {
+            _logbookController = new LogbookController(configFile);
+
+        }
+        else
+        {
+            _logbookController = new LogbookController(
+                PromptUser("[yellow]Enter the name of the config file. Leave blank to use default (config.json).[/]"));
+        }
         Start();
     }
 
@@ -149,7 +167,7 @@ public class TerminalController
                 return true;
             case "exit":
             case "quit":
-                if (_logbookController.SavedLogEntriesCount <= _logbookController.RadioLog.Count)
+                if (_logbookController.SavedLogEntriesCount < _logbookController.RadioLog.Count)
                 {
                     if (AnsiConsole.Confirm("There are unsaved log entries. Do you want to save them first? (Y/N)\n>>>"))
                     {
@@ -168,7 +186,7 @@ public class TerminalController
     /// <summary>
     /// Enters "log mode" where the user can input log entries until they type "exit".
     /// </summary>
-    /// <returns>Boolean for if the controller should contiunue checking for log entries. Used to exit back to the main loop.</returns>
+    /// <returns>Boolean for if the controller should continue checking for log entries. Used to exit back to the main loop.</returns>
     private bool LogMode()
     {
         AnsiConsole.MarkupLine("Log mode is activated. Type \"exit\" to exit.");

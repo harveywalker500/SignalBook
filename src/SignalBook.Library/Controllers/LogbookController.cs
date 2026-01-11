@@ -31,10 +31,11 @@ public class LogbookController
     /// <summary>
     /// Initializes a new instance of the <see cref="LogbookController"/> class.
     /// </summary>
-    public LogbookController()
+    public LogbookController(string configFileName = "")
     {
         Boats = Array.Empty<Boat>();
         RadioLog = new List<string>();
+        LoadConfig(configFileName);
     }
 
     /// <summary>
