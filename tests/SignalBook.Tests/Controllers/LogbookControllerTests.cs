@@ -20,13 +20,4 @@ public sealed class LogbookControllerTests
     }
 
 
-
-    /* This is broken at the moment, but I'll keep it in for now
-     [TestMethod]
-    public void LoadConfig_CustomConfig()
-    {
-        _logbookController.LoadConfig("TestConfig.json");
-        CollectionAssert.AreEqual(_logbookController.Boats, TestBoats);
-    }
-    */
 }

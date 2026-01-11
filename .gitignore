@@ -87,3 +87,4 @@ tests/ScratchTests.cs
 
 # Ignore manual build folder 
 build/
+artifacts/
