@@ -1,8 +1,0 @@
-{
-  "Boats": [
-    { "Number": "U-96", "Operator": "", "Colour": "Red" },
-    { "Number": "U-552", "Operator": "", "Colour": "Green" },
-    { "Number": "U-564", "Operator": "", "Colour": "Gold" },
-    { "Number": "U-307", "Operator": "", "Colour": "CadetBlue" }
-  ]
-}
