@@ -10,7 +10,7 @@ public static class Program
     /// <summary>
     /// The terminal controller instance. See <see cref="TerminalController"/>
     /// </summary>
-    private static TerminalController? _terminalController;
+    public static TerminalController? Controller { get; set; }
 
     /// <summary>
     /// The main entry point of the application.
@@ -21,6 +21,6 @@ public static class Program
         var banner = new FigletText("SignalBook")
             .Color(Color.DodgerBlue1);
         AnsiConsole.Write(banner);
-        _terminalController = new TerminalController();
+        Controller = new TerminalController();
     }
 }

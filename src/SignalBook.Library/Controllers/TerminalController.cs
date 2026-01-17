@@ -1,5 +1,4 @@
 using System.Reflection;
-using SignalBook.Controllers;
 using Spectre.Console;
 
 namespace SignalBook.Library.Controllers;
@@ -131,8 +130,13 @@ public class TerminalController
                 _logbookController.LoadLog(PromptUser("Enter the name of the log file."));
                 return true;
 
+            case "clear":
+                Console.Clear();
+                return true;
+
             case "log save":
-                _logbookController.SaveLog();
+                var logName = PromptUser("[yellow]Enter the name of the log file to save to.[/]");
+                _logbookController.SaveLog(_timeController, logName);
                 AnsiConsole.MarkupLine("[green dim]Logbook saved.[/]");
                 return true;
 
@@ -160,6 +164,7 @@ public class TerminalController
                                        log save        - Save the current logbook to file
                                        
                                        ------ Other commands -----
+                                       clear           - Clears the console
                                        info            - Show application information
                                        help            - Show this help message
                                        exit, quit      - Exit the application
@@ -172,7 +177,7 @@ public class TerminalController
                     if (AnsiConsole.Confirm("There are unsaved log entries. Do you want to save them first? (Y/N)\n>>>"))
                     {
                         AnsiConsole.MarkupLine("[green dim]Saving logbook...[/]");
-                        _logbookController.SaveLog();
+                        _logbookController.SaveLog(_timeController);
                     }
                 }
                 return false;
@@ -192,18 +197,25 @@ public class TerminalController
         AnsiConsole.MarkupLine("Log mode is activated. Type \"exit\" to exit.");
         while (true)
         {
-            string? logInput = AnsiConsole.Ask<string>("[yellow]log>[/]");
-            if (logInput == "exit")
-            {
-                AnsiConsole.MarkupLine("Exiting log mode.");
-                return true;
-            }
-
-            else if (string.IsNullOrWhiteSpace(logInput))
+            string logInput = AnsiConsole.Ask<string>("[yellow]log>[/]").Trim();
+            if (string.IsNullOrWhiteSpace(logInput))
             {
                 continue;
             }
-            _logbookController.Log(logInput, _timeController);
+            switch (logInput)
+            {
+                case "exit":
+                    return true;
+                case "del":
+                case "delete":
+                    _logbookController.Delete();
+                    AnsiConsole.MarkupLine("[green dim]Last log entry deleted.[/]");
+                    continue;
+
+                default:
+                    _logbookController.Log(logInput, _timeController);
+                    continue;
+            }
         }
     }
 

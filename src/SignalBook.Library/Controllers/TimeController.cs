@@ -1,7 +1,7 @@
 using System.Timers;
 using Spectre.Console;
 
-namespace SignalBook.Controllers;
+namespace SignalBook.Library.Controllers;
 
 /// <summary>
 /// The time controller responsible for managing the simulated clock.

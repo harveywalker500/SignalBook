@@ -1,7 +1,7 @@
 using System.Drawing;
 using System.Text.Json.Serialization;
 
-namespace SignalBook.Controllers;
+namespace SignalBook.Library.Controllers;
 
 /// <summary>
 /// A record class for a single boat.

@@ -1,4 +1,4 @@
-namespace SignalBook.Controllers;
+namespace SignalBook.Library.Controllers;
 
 /// <summary>
 /// The user configuration wrapper to pass information from the config file to the <see cref="LogbookController"/>.

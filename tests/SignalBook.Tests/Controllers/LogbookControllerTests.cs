@@ -1,4 +1,4 @@
-﻿using SignalBook.Controllers;
+﻿using SignalBook.Library.Controllers;
 
 namespace SignalBookTests.Controllers;
 

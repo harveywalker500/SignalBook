@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Spectre.Console;
 
-namespace SignalBook.Controllers;
+namespace SignalBook.Library.Controllers;
 
 /// <summary>
 /// The controller responsible for managing the logbook.
@@ -20,7 +20,7 @@ public class LogbookController
     /// <summary>
     /// A list of text log entries.
     /// </summary>
-    public List<string> RadioLog { get; set; }
+    public Stack<string> RadioLog { get; set; }
     /// <summary>
     /// The location of the configuration file.
     /// </summary>
@@ -29,12 +29,12 @@ public class LogbookController
     public int SavedLogEntriesCount { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LogbookController"/> class.
+    /// Initialises a new instance of the <see cref="LogbookController"/> class.
     /// </summary>
     public LogbookController(string configFileName = "")
     {
         Boats = Array.Empty<Boat>();
-        RadioLog = new List<string>();
+        RadioLog = [];
         LoadConfig(configFileName);
     }
 
@@ -80,8 +80,7 @@ public class LogbookController
     /// Prompts the user to edit the boat configuration interactively.
     /// </summary>
     /// <remarks>
-    /// This uses it's own instance of <see cref="PromptUser"> which should be changed.
-    /// </remarks>
+    /// This uses its own instance of <see cref="PromptUser"> which should be changed. </remarks>
     public static void EditConfig()
     {
         for (int i = 0; i < Boats.Length; i++)
@@ -108,6 +107,10 @@ public class LogbookController
             if (!string.IsNullOrEmpty(newColourString))
             {
                 Boats[i].ColourString = newColourString;
+                if (!Boats[i].Colour.IsKnownColor)
+                {
+                    AnsiConsole.MarkupLine($"[red]Warning! Colour {newColourString} is not known to application.[/]");
+                }
             } else {
                 AnsiConsole.MarkupLine("[red] Warning: Colour string was empty! [/]");
             }
@@ -137,7 +140,7 @@ public class LogbookController
     public void Log(string message, TimeController timeController)
     {
         var timestamp = timeController.Time.ToString(format: "HH:mm:ss");
-        RadioLog.Add($"{timestamp}: {message}");
+        RadioLog.Push($"{timestamp}: {message}");
     }
 
     /// <summary>
@@ -148,19 +151,26 @@ public class LogbookController
     {
         var logFileLocation = AppDomain.CurrentDomain.BaseDirectory + logFileName;
         StreamReader logFile = new StreamReader(logFileLocation);
-        while (logFile.EndOfStream == false)
+        while (!logFile.EndOfStream)
         {
-            RadioLog.Add(logFile.ReadLine());
+            RadioLog.Push(logFile.ReadLine());
         }
     }
 
     /// <summary>
     /// Saves the current radio log to a text file.
     /// </summary>
+    /// <param name="timeController">The time controller used for the </param>
     /// <param name="logFileName">File name of the radio log.</param>
-    public void SaveLog(string logFileName = "Radio Log.txt")
+    public void SaveLog(TimeController? timeController, string logFileName = "Radio Log.txt")
     {
+        if (timeController is not null)
+        {
+            logFileName = DateTime.Today + " - " + logFileName;
+        }
+
         var logFileLocation = AppDomain.CurrentDomain.BaseDirectory + logFileName;
+
         StreamWriter logFile = new StreamWriter(logFileLocation);
         foreach (string line in RadioLog)
         {
@@ -182,5 +192,16 @@ public class LogbookController
             .AllowEmpty();
         var promptReturn = AnsiConsole.Prompt(textPrompt);
         return promptReturn;
+    }
+
+    public void Delete()
+    {
+        if (RadioLog.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[red]No log entries to delete.[/]");
+            return;
+        }
+        RadioLog.Pop();
+
     }
 }
